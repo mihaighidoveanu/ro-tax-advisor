@@ -2,6 +2,10 @@
 
 This chatbot enables queries on romanian fiscal code, with citations.
 
+## Input file
+
+https://static.anaf.ro/static/10/Anaf/legislatie/Cod_fiscal_norme_2016.htm#A139
+
 ## Setup
 
 ```bash
