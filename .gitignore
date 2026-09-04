@@ -2,7 +2,13 @@ input/*
 tmp/chunks/*
 tmp/docling/*
 tmp/html/*
+tmp/vector_db/*
+tmp/test_vector_db/*
+.pytest_cache
 .env
 venv
+.venv
 *.pyc
+__pycache__/
 .DS_Store
+.claude/settings.local.json
