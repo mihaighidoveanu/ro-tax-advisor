@@ -4,6 +4,28 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _use_system_trust_store() -> None:
+    """Verify TLS against the OS trust store instead of certifi's frozen bundle.
+
+    Corporate networks often terminate TLS at a proxy that presents a certificate
+    signed by an internal root CA. That CA lives in the OS store (so ``curl`` and
+    browsers trust it) but not in the ``certifi`` bundle the OpenAI SDK and httpx
+    default to, so every model call fails with ``APIConnectionError``. ``truststore``
+    patches ``ssl`` globally to use the OS store, fixing OpenAI and Phoenix export.
+
+    Best-effort: if ``truststore`` is unavailable the app runs with certifi as before.
+    """
+    try:
+        import truststore
+
+        truststore.inject_into_ssl()
+    except Exception:
+        pass
+
+
+_use_system_trust_store()
+
+
 def _bool(value: str, default: bool = False) -> bool:
     if value is None:
         return default
@@ -12,11 +34,9 @@ def _bool(value: str, default: bool = False) -> bool:
 
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
 API_KEY = os.getenv("API_KEY")
-
-# Phoenix's and RAGAS's OpenAI-backed judges read the SDK-standard env var, not our
-# custom API_KEY name, so bridge it once here.
-if API_KEY and not os.getenv("OPENAI_API_KEY"):
-    os.environ["OPENAI_API_KEY"] = API_KEY
+# Point at an OpenAI-compatible provider other than OpenAI itself (e.g. Groq's
+# https://api.groq.com/openai/v1). Leave unset to use OpenAI's default endpoint.
+BASE_URL = os.getenv("BASE_URL") or None
 
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "sentence-transformers/all-MiniLM-L6-v2")
 

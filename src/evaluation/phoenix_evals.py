@@ -6,13 +6,13 @@ whether the retrieved chunks actually help answer the question. Both require a r
 judge, so this module makes real API calls and is not part of the default lightweight
 `evaluate.py` run.
 """
-from config import MODEL_NAME
+from config import API_KEY, BASE_URL, MODEL_NAME
 
 
 def _build_judge_llm(model_name: str = MODEL_NAME):
     from phoenix.evals import LLM
 
-    return LLM(provider="openai", model=model_name)
+    return LLM(provider="openai", model=model_name, api_key=API_KEY, base_url=BASE_URL)
 
 
 def _context_text(citations) -> str:

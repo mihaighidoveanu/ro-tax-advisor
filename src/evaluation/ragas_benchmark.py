@@ -58,9 +58,9 @@ def _build_ragas_metrics():
     from ragas.llms import llm_factory
     from ragas.metrics.collections import AnswerRelevancy, ContextPrecision, ContextRecall, Faithfulness
 
-    from config import API_KEY
+    from config import API_KEY, BASE_URL
 
-    judge = llm_factory(MODEL_NAME, provider="openai", client=OpenAI(api_key=API_KEY))
+    judge = llm_factory(MODEL_NAME, provider="openai", client=OpenAI(api_key=API_KEY, base_url=BASE_URL))
     embeddings = HuggingFaceEmbeddings(model=EMBEDDING_MODEL_NAME)
 
     return {
