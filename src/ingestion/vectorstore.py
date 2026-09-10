@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from chromadb.utils.batch_utils import create_batches
 from langchain_chroma import Chroma
 
 from config import VECTOR_DB_DIR
@@ -38,12 +39,20 @@ def save_embeddings(
     ]
     vectors = [e.tolist() if hasattr(e, "tolist") else list(e) for e in embeddings]
 
-    store._collection.upsert(
+    documents = list(texts)
+    for batch_ids, batch_vectors, batch_metadatas, batch_documents in create_batches(
+        api=store._client,
         ids=ids,
         embeddings=vectors,
-        documents=list(texts),
         metadatas=metadatas,
-    )
+        documents=documents,
+    ):
+        store._collection.upsert(
+            ids=batch_ids,
+            embeddings=batch_vectors,
+            documents=batch_documents,
+            metadatas=batch_metadatas,
+        )
 
     return store
 
